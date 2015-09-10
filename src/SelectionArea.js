@@ -1,59 +1,59 @@
+import {Point} from "./Point";
 
 class SelectionArea {
 
-	constructor(configuration = {}) {
-		this.id = configuration.id;
-		this.parent = configuration.parent;
-		this.pivotPoint = configuration.pivotPoint;
-		this.currentPosition = configuration.currentPosition;
-		this.html = configuration.html;
-		this.domRef = configuration.domRef;
+	constructor(parent = "selectionGroup", id = parent+"Overlay", css = "background:rgba(51,153,255,0.4); border:1px solid rgb(51,153,255);") {
+		this.id = id;
+		this.parent = parent;	
+		this.css = css;
+
+		this._pivotPoint = new Point(0, 0);
+		this._currentPosition = new Point(0, 0);
+
+		document.querySelector("."+this.parent).innerHTML 
+			+= `<div id="${this.id}" style="display: none; position: absolute; ${this.css}"></div>`;
+		this._domRef = document.getElementById(this.id);
 	}
 
-	appendToDom(){
-		document.querySelector("."+this.parent).innerHTML += this.html;
-		this.domRef = document.getElementById(this.id);
+	setPivot(x = 0, y = 0){
+		this._pivotPoint.setCoordinates(x, y);
+		this._domRef.style.width = '0px';
+		this._domRef.style.height = '0px';
+		this._domRef.style.left = x+'px';
+		this._domRef.style.top = y+'px';
+		this._domRef.style.display = 'block';
 	}
 
-	setPivot(point){
-		this.pivotPoint.setCoordinates(point.x, point.y);
-		this.domRef.style.width = '0px';
-		this.domRef.style.height = '0px';
-		this.domRef.style.left = point.x+'px';
-		this.domRef.style.top = point.y+'px';
-		this.domRef.style.display = 'block';
-	}
-
-	updateDimensions(point){
-		this.currentPosition.setCoordinates(point.x, point.y);
-		let minValue = this.currentPosition.getMinValuePoint(this.pivotPoint);
-		let difference = this.currentPosition.getDifference(this.pivotPoint);
-		this.domRef.style.top = minValue.y+"px";
-		this.domRef.style.left = minValue.x+"px";
-		this.domRef.style.width = difference.x+"px";
-		this.domRef.style.height = difference.y+"px";
-		this.domRef.style.bottom = minValue.y+difference.y+"px";
-		this.domRef.style.right = minValue.x+difference.x+"px";
+	updateDimensions(x = 0, y = 0){
+		this._currentPosition.setCoordinates(x, y);
+		let minValue = this._currentPosition.getMinValuePoint(this._pivotPoint);
+		let difference = this._currentPosition.getDifference(this._pivotPoint);
+		this._domRef.style.top = minValue.y+"px";
+		this._domRef.style.left = minValue.x+"px";
+		this._domRef.style.width = difference.x+"px";
+		this._domRef.style.height = difference.y+"px";
+		this._domRef.style.bottom = minValue.y+difference.y+"px";
+		this._domRef.style.right = minValue.x+difference.x+"px";
 	}
 
 	intersectsWith(object){
-		return object.getBoundingClientRect().right > parseFloat(this.domRef.style.left)
-			&& parseFloat(this.domRef.style.right) > object.getBoundingClientRect().left
-			&& object.getBoundingClientRect().bottom > parseFloat(this.domRef.style.top)
-			&& parseFloat(this.domRef.style.bottom) > object.getBoundingClientRect().top;
+		return object.getBoundingClientRect().right > parseFloat(this._domRef.style.left)
+			&& parseFloat(this._domRef.style.right) > object.getBoundingClientRect().left
+			&& object.getBoundingClientRect().bottom > parseFloat(this._domRef.style.top)
+			&& parseFloat(this._domRef.style.bottom) > object.getBoundingClientRect().top;
 	}
 
 	isBigerThan(width = 5, height = 5){
-		let difference = this.currentPosition.getDifference(this.pivotPoint);
+		let difference = this._currentPosition.getDifference(this._pivotPoint);
 		return difference.x > width || difference.y > height;
 	}
 
 	hide(){
-		this.domRef.style.display = 'none';
+		this._domRef.style.display = 'none';
 	}
 
 	isVisible(){
-		return this.domRef.style.display != 'none';
+		return this._domRef.style.display != 'none';
 	}
 }
 

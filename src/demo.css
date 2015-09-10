@@ -28,36 +28,36 @@ html, body, main{
 }
 
 .marvel{
-	background: #ED1C24;
-	color: #FFFFFF;
+	background: rgba(237, 28, 36, 1);
+	color: rgba(255, 255, 255, 1);
 }
-.marvel .overlay{
-	background: #12E3DB;
-	color: #000000;
+#marvelOverlay{
+	background: rgba(18, 227, 219, 0.4) !important;
+	color: rgba(0, 0, 0, 0.4) !important;
 }
 .dc{
-	background: #0770B2;
-	color: #131313;
+	background: rgba(7, 112, 178, 1);
+	color: rgba(19, 19, 19, 1);
 }
-.dc .overlay{
-	background: #F88F4D;
-	color: #000000;
+#dcOverlay{
+	background: rgba(248, 143, 77, 0.4) !important;
+	color: rgba(0, 0, 0, 0.4) !important;
 }
 .watchmen{
-	background: #000000;
-	color: #FFE713;
+	background: rgba(0, 0, 0, 1);
+	color: rgba(255, 231, 19, 1);
 }
-.watchmen .overlay{
-	background: #FFFFFF;
-	color: #0018EC;
+#watchmenOverlay{
+	background: rgba(255, 255, 255, 0.4) !important;
+	color: rgba(0, 24, 236, 0.4) !important;
 }
 .idw{
-	background: #FFFFFF;
-	color: #003966;
+	background: rgba(255, 255, 255, 1);
+	color: rgba(0, 57, 102, 1);
 }
-.idw .overlay{
-	background: #000000;
-	color: #FFC699;
+#idwOverlay{
+	background: rgba(0, 0, 0, 0.4) !important;
+	color: rgba(255, 198, 153, 0.4) !important;
 }
 
 .searchArea{

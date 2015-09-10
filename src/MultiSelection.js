@@ -1,4 +1,3 @@
-import {Point} from "./Point";
 import {SelectionArea} from "./SelectionArea";
 
 let forEach = Array.prototype.forEach;
@@ -6,37 +5,36 @@ let forEach = Array.prototype.forEach;
 class MultiSelection {	
 
 	constructor(configuration = {}) {
-		this._config = {
-			"markedClass": "marked",
-			"selectedClass": "selected",
-			"inSelectionClass": "inSelection"
-		};
-		this.overlay = new SelectionArea({
-			"id": "mouseOverlay",
-			"parent": "searchArea",
-			"pivotPoint": new Point(0, 0),
-			"currentPosition": new Point(0, 0),
-			"html": `<div id="mouseOverlay" style="display: none;"></div>`,
-			"domRef": null
-		});
+		this._config = this._setConfiguration({
+			markedClass: "marked",
+			selectedClass: "selected",
+			inSelectionClass: "inSelection",
+			selectionGroup: "selectionGroup",
+			overlayID: undefined
+		}, configuration);
 
-		this.overlay.appendToDom();
+		this._overlay = new SelectionArea(this._config.selectionGroup, this._config.overlayID);
 
-		this.addMouseDownEventListener();
-		this.addMouseUpEventListener();
-		this.addMouseMoveEventListener();
+		this._addMouseDownEventListener();
+		this._addMouseUpEventListener();
+		this._addMouseMoveEventListener();
 	}
 
-	addMouseDownEventListener(){
+	_setConfiguration(localConfig = {}, newConfig = {}){
+		Object.keys(newConfig).forEach(key => { localConfig[key] = newConfig[key]; });
+		return localConfig;
+	}
+
+	_addMouseDownEventListener(){
 		document.addEventListener('mousedown', event => {
 			// define short names
-			let targetClass = this.overlay.parent;
+			let targetClass = this._overlay.parent;
 			let selectedClass = this._config.selectedClass;
 			let inSelectionClass = this._config.inSelectionClass;
 			let markedClass = this._config.markedClass;
 
 			if(event.target.matches(`.${targetClass}, .${targetClass} *`)){
-				this.overlay.setPivot(new Point(event.pageX, event.pageY));
+				this._overlay.setPivot(event.pageX, event.pageY);
 
 				forEach.call(document.querySelectorAll(`.${selectedClass}`), element => {
 					if(event.ctrlKey){
@@ -48,7 +46,7 @@ class MultiSelection {
 				forEach.call(document.querySelectorAll(`.${markedClass}`), element => {
 					element.classList.add(inSelectionClass);
 				});
-				
+
 				if(event.target.matches(`.${targetClass} *`)){
 					if(event.target.className.includes(inSelectionClass)){
 						event.target.classList.remove(inSelectionClass);
@@ -60,17 +58,17 @@ class MultiSelection {
 		});
 	}
 
-	addMouseUpEventListener(){
+	_addMouseUpEventListener(){
 		document.addEventListener('mouseup', event => {
 			// define short names
-			let targetClass = this.overlay.parent;
-			let overlayID = this.overlay.id;
+			let targetClass = this._overlay.parent;
+			let overlayID = this._overlay.id;
 			let selectedClass = this._config.selectedClass;
 			let inSelectionClass = this._config.inSelectionClass;
 			let markedClass = this._config.markedClass;
 
 			if(event.target.matches(`.${targetClass}, .${targetClass} *, #${overlayID}`)){
-				this.overlay.hide();
+				this._overlay.hide();
 
 				forEach.call(document.querySelectorAll(`.${inSelectionClass}`), element => {
 					element.classList.add(selectedClass);
@@ -84,20 +82,20 @@ class MultiSelection {
 		});
 	}
 
-	addMouseMoveEventListener(){
+	_addMouseMoveEventListener(){
 		document.addEventListener('mousemove', event => {
 			// define short names
-			let targetClass = this.overlay.parent;
-			let overlayID = this.overlay.id;
+			let targetClass = this._overlay.parent;
+			let overlayID = this._overlay.id;
 			let inSelectionClass = this._config.inSelectionClass;
 			let markedClass = this._config.markedClass;
 
-			if(event.target.matches(`.${targetClass}, .${targetClass} *, #${overlayID}`) && this.overlay.isVisible()){
+			if(event.target.matches(`.${targetClass}, .${targetClass} *, #${overlayID}`) && this._overlay.isVisible()){
 
-				this.overlay.updateDimensions(new Point(event.pageX, event.pageY));
+				this._overlay.updateDimensions(event.pageX, event.pageY);
 
 				// only if overlay is bigger than min size it is used for selection, so not to influence the click event 
-				if(this.overlay.isBigerThan()){
+				if(this._overlay.isBigerThan()){
 
 					forEach.call(document.querySelectorAll(`.${inSelectionClass}:not(.${markedClass})`), element => {
 						element.classList.remove(inSelectionClass);
@@ -108,7 +106,7 @@ class MultiSelection {
 					});
 
 					forEach.call(document.querySelectorAll(`.${targetClass} > *`), element => {
-						if(this.overlay.intersectsWith(element)){
+						if(this._overlay.intersectsWith(element)){
 							if(element.className.includes(markedClass)){
 								element.classList.remove(inSelectionClass);
 							} else{

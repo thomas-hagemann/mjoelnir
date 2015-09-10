@@ -2,11 +2,11 @@
 This is going to be a small javascript library for **mulit selection** and **drag and drop**.
 
 ### Todos
- - refactor into es6 modules
  - add touch listeners
  - Add Code Comments
+ - add drag and drop
+ - setup tests environment
  - Add Documentation
- - Write Tests
 
 ### Version
  0.0.4
