@@ -2,35 +2,39 @@ import {Point} from "./Point";
 
 var forEach = Array.prototype.forEach;
 
-class MultiSelection {
+	class MultiSelection {
 
 	constructor(configuration = {}) {
+		this._config = {
+			"markedClass": "marked",
+			"selectedClass": "selected",
+			"inSelectionClass": "inSelection"
+		};
 		this.overlay = {
 			"id": "mouseOverlay",
 			"parent": "searchArea",
-      "startPosition": new Point(0, 0),
-      "currentPosition": new Point(0, 0),
-			"html":  `<div id="mouseOverlay" style="display: none;"></div>`,
+			"startPosition": new Point(0, 0),
+			"currentPosition": new Point(0, 0),
+			"html": `<div id="mouseOverlay" style="display: none;"></div>`,
 			"domRef": null
 		};
-    // append overlay
+		// append overlay
 		document.querySelector("."+this.overlay.parent).innerHTML += this.overlay.html;
 		this.overlay.domRef = document.getElementById(this.overlay.id);
 
-    this.addMouseDownEventListener();
-    this.addMouseUpEventListener();
-    this.addMouseMoveEventListener();
+		this.addMouseDownEventListener();
+		this.addMouseUpEventListener();
+		this.addMouseMoveEventListener();
 	}
 
-
-  _showOverlay(point){
-    this.overlay.startPosition.setCoordinates(point.x, point.y);
-    this.overlay.domRef.style.width = '0px';
-    this.overlay.domRef.style.height = '0px';
-    this.overlay.domRef.style.left = point.x+'px';
-    this.overlay.domRef.style.top = point.y+'px';
-    this.overlay.domRef.style.display = 'block';
-  }
+	_showOverlay(point){
+		this.overlay.startPosition.setCoordinates(point.x, point.y);
+		this.overlay.domRef.style.width = '0px';
+		this.overlay.domRef.style.height = '0px';
+		this.overlay.domRef.style.left = point.x+'px';
+		this.overlay.domRef.style.top = point.y+'px';
+		this.overlay.domRef.style.display = 'block';
+	}
 
 	intersectWithSelection(object){
 		var element = {
@@ -43,7 +47,7 @@ class MultiSelection {
 		};
 		var selection = this.getMouseOverlay();
 		return element.right > selection.left && selection.right > element.left &&
-				element.bottom > selection.top && selection.bottom > element.top;
+		element.bottom > selection.top && selection.bottom > element.top;
 	}
 
 	getMouseOverlay(){
@@ -66,65 +70,61 @@ class MultiSelection {
 
 	addMouseDownEventListener(){
 		document.addEventListener('mousedown', event => {
-			if(event.target.matches('.searchArea, .searchArea *')){
-				event.preventDefault();
-        this._showOverlay(new Point(event.pageX, event.pageY));
+			if(event.target.matches(`.${this.overlay.parent}, .${this.overlay.parent} *`)){
+				this._showOverlay(new Point(event.pageX, event.pageY));
 
 				// marked selected and clear old selection
-				forEach.call(document.querySelectorAll(".selected"), element => {
+				forEach.call(document.querySelectorAll(`.${this._config.selectedClass}`), element => {
 					if(event.ctrlKey){
-						element.classList.add('marked');
+						element.classList.add(this._config.markedClass);
 					}
-					element.classList.remove('selected');
+					element.classList.remove(this._config.selectedClass);
 				});
 
 				// add marked to current selection
-				forEach.call(document.querySelectorAll(".marked"), element => {
-					element.classList.add('inSelection');
+				forEach.call(document.querySelectorAll(`.${this._config.markedClass}`), element => {
+					element.classList.add(this._config.inSelectionClass);
 				});
-
-				if(event.target.className.includes("selectable")){
+				if(event.target.matches(`.${this.overlay.parent} *`)){
 					// add or remove to selection
-					if(event.target.className.includes("inSelection")){
-						event.target.classList.remove("inSelection");
+					if(event.target.className.includes(this._config.inSelectionClass)){
+						event.target.classList.remove(this._config.inSelectionClass);
 					} else{
-						event.target.classList.add("inSelection");
+						event.target.classList.add(this._config.inSelectionClass);
 					}
 				}
 			}
 		});
-  }
+	}
 
-  addMouseUpEventListener(){
+	addMouseUpEventListener(){
 		document.addEventListener('mouseup', event => {
-			if(event.target.matches('.searchArea, .searchArea *, #mouseOverlay, #mouseOverlay *')){
-				event.preventDefault();
+			if(event.target.matches(`.${this.overlay.parent}, .${this.overlay.parent} *, #${this.overlay.id}`)){
 				this.overlay.domRef.style.display = 'none';
 
 				// set current selection as selected
-				forEach.call(document.querySelectorAll(".inSelection"), element => {
-					element.classList.add('selected');
-					element.classList.remove('inSelection');
+				forEach.call(document.querySelectorAll(`.${this._config.inSelectionClass}`), element => {
+					element.classList.add(this._config.selectedClass);
+					element.classList.remove(this._config.inSelectionClass);
 				});
-				forEach.call(document.querySelectorAll(".marked"), element => {
-					element.classList.remove('marked');
+				forEach.call(document.querySelectorAll(`.${this._config.markedClass}`), element => {
+					element.classList.remove(this._config.markedClass);
 				});
 			}
 		});
-  }
+	}
 
-  addMouseMoveEventListener(){
+	addMouseMoveEventListener(){
 		document.addEventListener('mousemove', event => {
-			if(event.target.matches('.searchArea, .searchArea *, #mouseOverlay, #mouseOverlay *')){
-				event.preventDefault();
-					this.overlay.currentPosition.x = event.pageX;
-					this.overlay.currentPosition.y = event.pageY;
+			if(event.target.matches(`.${this.overlay.parent}, .${this.overlay.parent} *, #${this.overlay.id}`)){
+				this.overlay.currentPosition.x = event.pageX;
+				this.overlay.currentPosition.y = event.pageY;
 
 				// if mouseOverlay exists
 				if(this.overlay.domRef.style.display != 'none'){
 					// update overlay size
 					var newMouseOverlayStyle = this.getMouseOverlay();
-					var mouseOverlay = document.querySelector('#mouseOverlay');
+					var mouseOverlay = document.getElementById(this.overlay.id);
 					mouseOverlay.style.top = newMouseOverlayStyle.top+"px";
 					mouseOverlay.style.left = newMouseOverlayStyle.left+"px";
 					mouseOverlay.style.width = newMouseOverlayStyle.width+"px";
@@ -136,21 +136,20 @@ class MultiSelection {
 					// if overlay is bigger than min size
 					if(this.isOverlayBiggerThanMinSize()){
 						// clear marked
-						forEach.call(document.querySelectorAll(".inSelection:not(.marked)"), element => {
-							element.classList.remove('inSelection');
+						forEach.call(document.querySelectorAll(`.${this._config.inSelectionClass}:not(.${this._config.markedClass})`), element => {
+							element.classList.remove(this._config.inSelectionClass);
 						});
 
-						forEach.call(document.querySelectorAll(".marked"), element => {
-							element.classList.add('inSelection');
+						forEach.call(document.querySelectorAll(`.${this._config.markedClass}`), element => {
+							element.classList.add(this._config.inSelectionClass);
 						});
 
-						forEach.call(document.querySelectorAll(".selectable"), element => {
+						forEach.call(document.querySelectorAll(`.${this.overlay.parent} > *`), element => {
 							if(this.intersectWithSelection(element)){
-								if(element.className.includes("marked")){
-									element.classList.remove('inSelection');
+								if(element.className.includes(this._config.markedClass)){
+									element.classList.remove(this._config.inSelectionClass);
 								} else{
-
-									element.classList.add('inSelection');
+									element.classList.add(this._config.inSelectionClass);
 								}
 							}
 						});
