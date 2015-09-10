@@ -1,19 +1,24 @@
 # Mjölnir
 This is going to be a small javascript library for **mulit selection** and **drag and drop**.
 
-### Tech
-Currently used technologies:
-* jQuery
-
 ### Todos
- - set up dev enviroment for es6
  - refactor into es6 modules
+ - add touch listeners
  - Add Code Comments
  - Add Documentation
  - Write Tests
 
 ### Version
- 0.0.3
+ 0.0.4
 
 ### License
 MIT
+
+### Tech
+Currently used dependencies:
+* Font [Orbitron](https://fonts.googleapis.com/css?family=Orbitron:900)
+* ~~jQuery (only in prototypes)~~
+
+
+### Acknowledgement
+  - The initial project setup was done with [es6-babel-browserify-boilerplate](https://github.com/thoughtram/es6-babel-browserify-boilerplate)

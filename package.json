@@ -1,0 +1,28 @@
+{
+  "name": "mjoelnir",
+  "version": "0.0.4",
+  "description": "javascript library for multi selection and drag and drop",
+  "homepage": "https://github.com/thomas-hagemann",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/thomas-hagemann.git"
+  },
+  "keywords": [
+    "multi",
+    "selection",
+    "drag",
+    "drop"
+  ],
+  "author": "Thomas Hagemann",
+  "license": "MIT",
+  "devDependencies": {
+    "babelify": "^6.3.0",
+    "browser-sync": "^2.9.3",
+    "browserify": "^11.0.1",
+    "gulp": "^3.9.0",
+    "lodash": "^3.10.1",
+    "rimraf": "^2.4.3",
+    "vinyl-source-stream": "^1.1.0",
+    "watchify": "^3.4.0"
+  }
+}
