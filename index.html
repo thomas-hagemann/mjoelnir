@@ -1,30 +1,85 @@
 <!DOCTYPE html>
 <html>
 	<head>
-	  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
 		<style>
-			html, body{
-				width: 100%;
-				height: 100%;
+
+			@import url(https://fonts.googleapis.com/css?family=Orbitron:900);
+
+			*{
 				margin: 0;
 				padding: 0;
+				font-family: Tahoma;
+				-moz-user-select: none;
+				user-select: none;
+			}
+
+			html, body, main{
+				width: 100%;
+				height: 100%;
+				background: #F0F1F2;
+			}
+
+			.selection_areas{
+				width: 900px;
+				display: flex;
+				flex-flow: row wrap;
+			}
+
+			.selection_areas > div{
+				flex: 2 0 0;
+				min-width: 50%;
+				padding: 20px;
+				box-sizing:border-box;
+			}
+
+			.marvel{
+				background: #ED1C24;
+				color: #FFFFFF;
+			}
+			.marvel .overlay{
+				background: #12E3DB;
+				color: #000000;
+			}
+			.dc{
+				background: #0770B2;
+				color: #131313;
+			}
+			.dc .overlay{
+				background: #F88F4D;
+				color: #000000;
+			}
+			.watchmen{
+				background: #000000;
+				color: #FFE713;
+			}
+			.watchmen .overlay{
+				background: #FFFFFF;
+				color: #0018EC;
+			}
+			.idw{
+				background: #FFFFFF;
+				color: #003966;
+			}
+			.idw .overlay{
+				background: #000000;
+				color: #FFC699;
 			}
 
 			.searchArea{
 				display: inline-block;
-				width: 94%;
-				min-height: 100%;
-				background: gold;
 				padding: 20px;
 			}
 
 			.element{
+				font-family: 'Orbitron', sans-serif;
+				font-size: 1.2em;
 				display: inline-block;
-				width: 50px;
-				height: 80px;
-				background: dodgerblue;
-				margin: 5px;
+				margin: 10px;
+				border: 2px solid;
+				padding: 5px 15px;
+				border-radius: 9px;
 			}
 
 			.selected, .inSelection{
@@ -36,36 +91,51 @@
 				border:1px solid rgb(51,153,255);
 				position: absolute;
 			}
+
 		</style>
 	</head>
 	<body>
-		<div class="searchArea">
-			<div class="element selectable" id="01">01</div>
-			<div class="element selectable" id="02">02</div>
-			<div class="element selectable" id="03">03</div>
-			<div class="element selectable" id="04">04</div>
-			<div class="element selectable" id="05">05</div>
-			<div class="element selectable" id="06">06</div>
-			<div class="element selectable" id="07">07</div>
-			<div class="element selectable" id="08">08</div>
-			<div class="element selectable" id="09">09</div>
-			<div class="element selectable" id="10">10</div>
-			<div class="element selectable" id="11">11</div>
-			<div class="element selectable" id="12">12</div>
-			<div class="element selectable" id="13">13</div>
-			<div class="element selectable" id="14">14</div>
-			<div class="element selectable" id="15">15</div>
-			<div class="element selectable" id="16">16</div>
-			<div class="element selectable" id="17">17</div>
-			<div class="element selectable" id="18">18</div>
-			<div class="element selectable" id="19">19</div>
-			<div class="element selectable" id="20">20</div>
-			<div class="element selectable" id="21">21</div>
-			<div class="element selectable" id="22">22</div>
-			<div class="element selectable" id="23">23</div>
-			<div class="element selectable" id="24">24</div>
-			<div class="element selectable" id="25">25</div>
-		</div>
+		<main>
+			<section class="selection_areas">
+				<div class="searchArea marvel">
+					<div class="element selectable">Princess Powerful</div>
+					<div class="element selectable">Spider-Man</div>
+					<div class="element selectable">Wolverine</div>
+					<div class="element selectable">Thor</div>
+					<div class="element selectable">Nightcrawler</div>
+					<div class="element selectable">Captain America</div>
+					<div class="element selectable">Iron Man</div>
+					<div class="element selectable">Daredevil</div>
+					<div class="element selectable">Hulk</div>
+				</div>
+				<div class="searchArea2 dc watchmen">
+					<div class="element selectable">Rorschach</div>
+					<div class="element selectable">Dr. Manhattan</div>
+					<div class="element selectable">Nite Owl</div>
+				</div>
+				<div class="searchArea3 dc">
+					<div class="element selectable">Oracle</div>
+					<div class="element selectable">Nightwing</div>
+					<div class="element selectable">Flash</div>
+					<div class="element selectable">Green Lantern</div>
+					<div class="element selectable">Wonder Woman</div>
+					<div class="element selectable">Batman</div>
+					<div class="element selectable">Superman</div>
+					<div class="element selectable">Aquaman</div>
+					<div class="element selectable">Martian Manhunter</div>
+				</div>
+				<div class="searchArea4 idw">
+					<div class="element selectable">Raphael</div>
+					<div class="element selectable">Donatello</div>
+					<div class="element selectable">Michelangelo</div>
+					<div class="element selectable">Leonardo</div>
+				</div>
+			</section>
+			<section class="configuration">b</section>
+			<section class="html">c</section>
+			<section class="css">d</section>
+		</main>
+
 
 		 <script type="text/javascript">
 			var mousePosition = { 'start':{ 'x': 0, 'y': 0 }, 'current':{ 'x': 0, 'y': 0 } };
@@ -184,16 +254,3 @@
 		 </script>
 	</body>
 </html>
-
-
-
-
-
-
-
-
-
-
-/*
-click on not selectable item should clear the selection
-*/
