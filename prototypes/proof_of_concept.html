@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+		<style>
+			html, body{
+				width: 100%;
+				height: 100%;
+				margin: 0;
+				padding: 0;
+			}
+
+			.searchArea{
+				display: inline-block;
+				width: 94%;
+				min-height: 100%;
+				background: gold;
+				padding: 20px;
+			}
+
+			.element{
+				display: inline-block;
+				width: 50px;
+				height: 80px;
+				background: dodgerblue;
+				margin: 5px;
+			}
+
+			.selected, .inSelection{
+				background: limegreen;
+			}
+
+			#mouseOverlay{
+				background:rgba(51,153,255,0.4);
+				border:1px solid rgb(51,153,255);
+				position: absolute;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="searchArea">
+			<div class="element selectable" id="01">01</div>
+			<div class="element selectable" id="02">02</div>
+			<div class="element selectable" id="03">03</div>
+			<div class="element selectable" id="04">04</div>
+			<div class="element selectable" id="05">05</div>
+			<div class="element selectable" id="06">06</div>
+			<div class="element selectable" id="07">07</div>
+			<div class="element selectable" id="08">08</div>
+			<div class="element selectable" id="09">09</div>
+			<div class="element selectable" id="10">10</div>
+			<div class="element selectable" id="11">11</div>
+			<div class="element selectable" id="12">12</div>
+			<div class="element selectable" id="13">13</div>
+			<div class="element selectable" id="14">14</div>
+			<div class="element selectable" id="15">15</div>
+			<div class="element selectable" id="16">16</div>
+			<div class="element selectable" id="17">17</div>
+			<div class="element selectable" id="18">18</div>
+			<div class="element selectable" id="19">19</div>
+			<div class="element selectable" id="20">20</div>
+			<div class="element selectable" id="21">21</div>
+			<div class="element selectable" id="22">22</div>
+			<div class="element selectable" id="23">23</div>
+			<div class="element selectable" id="24">24</div>
+			<div class="element selectable" id="25">25</div>
+		</div>
+
+		 <script type="text/javascript">
+			var mousePosition = { 'start':{ 'x': 0, 'y': 0 }, 'current':{ 'x': 0, 'y': 0 } };
+
+			$( document ).ready(function() {
+				function intersectWithSelection(object){
+					var element = {
+						'top': object[0].getBoundingClientRect().top,
+						'left': object[0].getBoundingClientRect().left,
+						'width': object[0].getBoundingClientRect().width,
+						'height': object[0].getBoundingClientRect().height,
+						'bottom': object[0].getBoundingClientRect().bottom,
+						'right': object[0].getBoundingClientRect().right
+					};
+					var selection = getMouseOverlay();
+					return element.right > selection.left && selection.right > element.left &&
+							element.bottom > selection.top && selection.bottom > element.top;
+				}
+
+				function getMouseOverlay(){
+					return {
+						'top': Math.min(mousePosition.start.y, mousePosition.current.y),
+						'left': Math.min(mousePosition.start.x, mousePosition.current.x),
+						'width': Math.abs(mousePosition.start.x - mousePosition.current.x),
+						'height': Math.abs(mousePosition.start.y - mousePosition.current.y),
+						'bottom': Math.min(mousePosition.start.y, mousePosition.current.y)+Math.abs(mousePosition.start.y - mousePosition.current.y),
+						'right': Math.min(mousePosition.start.x, mousePosition.current.x)+Math.abs(mousePosition.start.x - mousePosition.current.x)
+					};
+				}
+
+				function isOverlayBiggerThanMinSize(){
+					var minSize = 10;
+					return Math.abs(mousePosition.current.x - mousePosition.start.x) > minSize ||
+							  Math.abs(mousePosition.current.y - mousePosition.start.y) > minSize;
+				}
+
+				$( document.body).on("mousedown", ".searchArea" , function(event) {
+					event.preventDefault();
+					mousePosition.start.x = event.pageX;
+					mousePosition.start.y = event.pageY;
+					$("body").append($('<div />',{'id': 'mouseOverlay'})
+							  .css({ 'left': mousePosition.start.x, 'top': mousePosition.start.y }));
+
+					// marked selected and clear old selection
+					$(".selected").each(function(){
+						if(event.ctrlKey){
+							$(this).addClass("marked");
+						}
+						$(this).removeClass("selected");
+					});
+
+					// add marked to current selection
+					$(".marked").each(function(){
+						$(this).addClass("inSelection");
+					});
+
+					if(event.target.className.includes("selectable")){
+						// add or remove to selection
+						if($(event.target).hasClass("inSelection")){
+							$(event.target).removeClass("inSelection");
+						} else{
+							$(event.target).addClass("inSelection");
+						}
+					}
+				});
+
+				$(document.body).on("mouseup", ".searchArea, #mouseOverlay", function(event) {
+					event.preventDefault();
+					mousePosition.start.x = 0;
+					mousePosition.start.y = 0;
+					$("#mouseOverlay").remove();
+
+					// set current selection as selected
+					$(".inSelection").each(function(){
+						$(this).addClass("selected");
+						$(this).removeClass("inSelection");
+					});
+					$(".marked").each(function(){
+						$(this).removeClass("marked");
+					});
+				});
+
+				$(document.body).on("mousemove",".searchArea, #mouseOverlay", function(event) {
+					event.preventDefault();
+					mousePosition.current.x = event.pageX;
+					mousePosition.current.y = event.pageY;
+					// if mouseOverlay exists
+					if($("#mouseOverlay").size() > 0){
+						// update overlay size
+						$("#mouseOverlay").css(getMouseOverlay());
+
+						// if overlay is bigger than min size
+						if(isOverlayBiggerThanMinSize()){
+							// clear marked
+							$(".inSelection:not(.marked)").each(function(){
+								$(this).removeClass("inSelection");
+							});
+
+							$(".marked").each(function(){
+								$(this).addClass("inSelection");
+							});
+
+							$(".selectable").each(function(){
+								if(intersectWithSelection($(this))){
+									if($(this).hasClass("marked")){
+										$(this).removeClass("inSelection");
+									} else{
+										$(this).addClass("inSelection");
+									}
+								}
+							});
+						}
+					}
+				});
+			});
+		 </script>
+	</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+/*
+click on not selectable item should clear the selection
+*/
