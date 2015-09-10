@@ -31,10 +31,6 @@ class Point {
 		return `Point(${this._x}/${this._y})`;
 	}
 
-	clone(){
-		return new Point(this._x, this._y);
-	}
-
 	getDifference(comparePoint){
 		return new Point(Math.abs(this._x - comparePoint.x), Math.abs(this._y - comparePoint.y));
 	}
