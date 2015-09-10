@@ -1,7 +1,4 @@
 global.app = function () {
-	console.log("Hello World");
-	/*
-
 	 var mousePosition = { 'start':{ 'x': 0, 'y': 0 }, 'current':{ 'x': 0, 'y': 0 } };
 
 	 document.addEventListener('DOMContentLoaded', function() {
@@ -140,5 +137,4 @@ global.app = function () {
 			 }
 		 });
 	 });
-	*/
 };
