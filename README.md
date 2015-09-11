@@ -1,12 +1,6 @@
 # Mjölnir
 This is going to be a small javascript library for **mulit selection** and **drag and drop**.
 
-### Todos
- - add touch listeners
- - Add Code Comments
- - add drag and drop
- - setup tests environment
- - Add Documentation
 
 ### Version
  0.0.4
