@@ -4,14 +4,19 @@ class SelectionArea {
 
 	constructor(parent = "selectionGroup", id = parent+"Overlay", css = "background:rgba(51,153,255,0.4); border:1px solid rgb(51,153,255);") {
 		this.id = id;
-		this.parent = parent;	
-		this.css = css;
+		this.parent = parent;
 
 		this._pivotPoint = new Point(0, 0);
 		this._currentPosition = new Point(0, 0);
 
-		document.querySelector("."+this.parent).innerHTML 
-			+= `<div id="${this.id}" style="display: none; position: absolute; ${this.css}"></div>`;
+		const style = document.createElement("style");
+		style.innerHTML = 	`#${id} {
+			${css}
+		}`;
+		document.head.insertBefore(style, document.head.firstChild);
+
+		document.querySelector("."+this.parent).innerHTML
+			+= `<div id="${this.id}" style="display: none; position: absolute;"></div>`;
 		this._domRef = document.getElementById(this.id);
 	}
 
@@ -26,8 +31,8 @@ class SelectionArea {
 
 	updateDimensions(x = 0, y = 0){
 		this._currentPosition.setCoordinates(x, y);
-		let minValue = this._currentPosition.getMinValuePoint(this._pivotPoint);
-		let difference = this._currentPosition.getDifference(this._pivotPoint);
+		const minValue = this._currentPosition.getMinValuePoint(this._pivotPoint);
+		const difference = this._currentPosition.getDifference(this._pivotPoint);
 		this._domRef.style.top = minValue.y+"px";
 		this._domRef.style.left = minValue.x+"px";
 		this._domRef.style.width = difference.x+"px";
@@ -44,7 +49,7 @@ class SelectionArea {
 	}
 
 	isBigerThan(width = 5, height = 5){
-		let difference = this._currentPosition.getDifference(this._pivotPoint);
+		const difference = this._currentPosition.getDifference(this._pivotPoint);
 		return difference.x > width || difference.y > height;
 	}
 

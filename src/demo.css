@@ -31,33 +31,22 @@ html, body, main{
 	background: rgba(237, 28, 36, 1);
 	color: rgba(255, 255, 255, 1);
 }
-#marvelOverlay{
-	background: rgba(18, 227, 219, 0.4) !important;
-	color: rgba(0, 0, 0, 0.4) !important;
-}
 .dc{
 	background: rgba(7, 112, 178, 1);
 	color: rgba(19, 19, 19, 1);
-}
-#dcOverlay{
-	background: rgba(248, 143, 77, 0.4) !important;
-	color: rgba(0, 0, 0, 0.4) !important;
 }
 .watchmen{
 	background: rgba(0, 0, 0, 1);
 	color: rgba(255, 231, 19, 1);
 }
-#watchmenOverlay{
-	background: rgba(255, 255, 255, 0.4) !important;
-	color: rgba(0, 24, 236, 0.4) !important;
+.watchmen .selected,
+.watchmen .inSelection{
+	background: rgba(255, 255, 255,  1);
+	color: rgba(0, 24, 236,  1);
 }
+
 .idw{
-	background: rgba(255, 255, 255, 1);
-	color: rgba(0, 57, 102, 1);
-}
-#idwOverlay{
-	background: rgba(0, 0, 0, 0.4) !important;
-	color: rgba(255, 198, 153, 0.4) !important;
+	background: rgba(255, 255, 255, 1); color: rgba(0, 57, 102, 1);
 }
 
 .searchArea{
@@ -73,14 +62,4 @@ html, body, main{
 	border: 2px solid;
 	padding: 5px 15px;
 	border-radius: 9px;
-}
-
-.selected, .inSelection{
-	background: limegreen;
-}
-
-#mouseOverlay{
-	background:rgba(51,153,255,0.4);
-	border:1px solid rgb(51,153,255);
-	position: absolute;
 }
