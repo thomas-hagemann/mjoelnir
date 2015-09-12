@@ -101,9 +101,13 @@ class MultiSelection {
 			const inSelectionClass = this._config.inSelectionClass;
 			const markedClass = this._config.markedClass;
 
+			// check if mouse down is on defined element or its children
 			if(event.target.matches(`.${targetClass}, .${targetClass} *`)){
 				this._overlay.setPivot(event.pageX, event.pageY);
 
+				// run through all selected elements and remove the selection, 
+				// if inverted selection is active i.e ctrl key is pressed, 
+				// add a "marked" flag to the element
 				forEach.call(document.querySelectorAll(`.${selectedClass}`), element => {
 					if(event.ctrlKey){
 						element.classList.add(markedClass);
@@ -111,10 +115,13 @@ class MultiSelection {
 					element.classList.remove(selectedClass);
 				});
 
+				// run through all marked elements and add them to the current selection i.e. "inSelection"
 				forEach.call(document.querySelectorAll(`.${markedClass}`), element => {
 					element.classList.add(inSelectionClass);
 				});
 
+				// check if mouse down is on a selectable element
+				// and toggle its current selection marker
 				if(event.target.matches(`.${targetClass} *`)){
 					if(event.target.className.includes(inSelectionClass)){
 						event.target.classList.remove(inSelectionClass);
@@ -143,18 +150,19 @@ class MultiSelection {
 			const inSelectionClass = this._config.inSelectionClass;
 			const markedClass = this._config.markedClass;
 
-			if(event.target.matches(`.${targetClass}, .${targetClass} *, #${overlayID}`)){
-				this._overlay.hide();
+			// hide the overlay
+			this._overlay.hide();
 
-				forEach.call(document.querySelectorAll(`.${inSelectionClass}`), element => {
-					element.classList.add(selectedClass);
-					element.classList.remove(inSelectionClass);
-				});
+			// run through all currently selected elements and switch the currently selected marker for the selected one
+			forEach.call(document.querySelectorAll(`.${inSelectionClass}`), element => {
+				element.classList.add(selectedClass);
+				element.classList.remove(inSelectionClass);
+			});
 
-				forEach.call(document.querySelectorAll(`.${markedClass}`), element => {
-					element.classList.remove(markedClass);
-				});
-			}
+			// run through all "marked" elements and remove the flag
+			forEach.call(document.querySelectorAll(`.${markedClass}`), element => {
+				element.classList.remove(markedClass);
+			});
 		});
 
 		return this;
@@ -174,21 +182,30 @@ class MultiSelection {
 			const inSelectionClass = this._config.inSelectionClass;
 			const markedClass = this._config.markedClass;
 
-			if(event.target.matches(`.${targetClass}, .${targetClass} *, #${overlayID}`) && this._overlay.isVisible()){
+			// check if mouse over is on defined element or its children 
+			// and if the overlay is visible
+			if(event.target.matches(`.${targetClass}, .${targetClass} *`) && this._overlay.isVisible()){
 
+				// update the overlays demensions
 				this._overlay.updateDimensions(event.pageX, event.pageY);
 
 				// only if overlay is bigger than min size it is used for selection, so not to influence the click event
 				if(this._overlay.isBigerThan()){
 
+					// run through all currently selected elements that are not already been marked
+					// and remove them from the current selection
 					forEach.call(document.querySelectorAll(`.${inSelectionClass}:not(.${markedClass})`), element => {
 						element.classList.remove(inSelectionClass);
 					});
 
+					// run through all marked elements and add them to the current selection
 					forEach.call(document.querySelectorAll(`.${markedClass}`), element => {
 						element.classList.add(inSelectionClass);
 					});
 
+					// run through all direct children of the defined elements
+					// and check if they intersect with the overlay
+					// add or remove them to the current selection
 					forEach.call(document.querySelectorAll(`.${targetClass} > *`), element => {
 						if(this._overlay.intersectsWith(element)){
 							if(element.className.includes(markedClass)){
