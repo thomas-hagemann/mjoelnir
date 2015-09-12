@@ -20,6 +20,8 @@
     "browser-sync": "^2.9.3",
     "browserify": "^11.0.1",
     "gulp": "^3.9.0",
+    "gulp-shell": "^0.4.3",
+    "jsdoc": "git+https://github.com/jsdoc3/jsdoc.git",
     "lodash": "^3.10.1",
     "rimraf": "^2.4.3",
     "vinyl-source-stream": "^1.1.0",

@@ -1,4 +1,5 @@
 var gulp = require('gulp');
+var shell = require('gulp-shell');
 var fs = require('fs');
 var browserify = require('browserify');
 var watchify = require('watchify');
@@ -38,19 +39,25 @@ function bundle() {
     .pipe(reload({ stream: true }));
 }
 
-gulp.task('copyfiles', function() {
-    gulp.src('./src/**/*.{html,css}').pipe(gulp.dest(config.outputDir));
+gulp.task('js-doc', function() {
+ // process.stdout.write('[js-doc]\n')
+  shell.task(['node_modules/jsdoc/jsdoc src/.'])
 });
 
-gulp.task('build-persistent', function() {  
+gulp.task('copyfiles', ['js-doc'], function() {
+  //process.stdout.write('[copyfiles]\n')
+  gulp.src('./src/**/*.{html,css}').pipe(gulp.dest(config.outputDir));
+});
+
+gulp.task('build-persistent', ['copyfiles'], function() {
+  //process.stdout.write('[build-persistent]\n')
   return bundle();
 });
 
-gulp.task('build', ['build-persistent'], function() {
-  gulp.run('copyfiles');
+gulp.task('build', ['build-persistent', 'copyfiles'], function() {
+  //process.stdout.write('[build]\n')
   process.exit(0);
 });
-
 
 gulp.task('watch', ['build-persistent'], function() {
   browserSync({
@@ -62,8 +69,9 @@ gulp.task('watch', ['build-persistent'], function() {
   getBundler().on('update', function() {
     gulp.start('build-persistent')
   });
-  gulp.watch('src/**/*.html', ['copyfiles']);
-  gulp.watch('src/**/*.css', ['copyfiles']);
+
+  gulp.watch('src/**/*.html', ['copyfiles'])
+  gulp.watch('src/**/*.css', ['copyfiles'])
 
 });
 
