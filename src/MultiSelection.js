@@ -69,6 +69,8 @@ class MultiSelection {
 		this._addMouseDownEventListener();
 		this._addMouseUpEventListener();
 		this._addMouseMoveEventListener();
+
+		return this;
 	}
 
 	/*
@@ -79,9 +81,10 @@ class MultiSelection {
 	 * @param {Object} [newConfig = {}] - new configuration 
 	 * @returns {Object} configuration object
 	 */
-	_setConfiguration(localConfig = {}, newConfig = {}){
-		Object.keys(newConfig).forEach(key => { localConfig[key] = newConfig[key]; });
-		return localConfig;
+	_setConfiguration(config = {}, newConfig = {}){
+		Object.keys(newConfig).forEach(key => { config[key] = newConfig[key]; });
+
+		return config;
 	}
 
 	/*
@@ -121,6 +124,8 @@ class MultiSelection {
 				}
 			}
 		});
+
+		return this;
 	}
 
 	/*
@@ -151,6 +156,8 @@ class MultiSelection {
 				});
 			}
 		});
+
+		return this;
 	}
 
 	/*
@@ -194,6 +201,8 @@ class MultiSelection {
 				}
 			}
 		});
+
+		return this;
 	}
 }
 
