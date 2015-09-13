@@ -60,17 +60,14 @@ global.app = function () {
 
 	// listen to selection Change event
 	marvel_selectionGroup.addEventListener('selectionChanged', event => {
-		console.log(event);
 		marvel_list.innerHTML = "";
 		event.selection.forEach(element => { marvel_list.innerHTML += `<li>${element.textContent}</li>` });
 	});
 	dc_selectionGroup.addEventListener('selectionChanged', event => {
-		console.log(event);
 		dc_list.innerHTML = "";
 		event.selection.forEach(element => { dc_list.innerHTML += `<li>${element.textContent}</li>` });
 	});
 	idw_selectionGroup.addEventListener('selectionChanged', event => {
-		console.log(event);
 		idw_list.innerHTML = "";
 		event.selection.forEach(element => { idw_list.innerHTML += `<li>${element.textContent}</li>` });
 	});

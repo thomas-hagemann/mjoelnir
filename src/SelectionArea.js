@@ -106,10 +106,10 @@ class SelectionArea {
 	 * @returns {Boolean} true if the given object and the selection area intersect, otherwith false 
 	 */
 	intersectsWith(object){
-		return object.getBoundingClientRect().right > parseFloat(this._domRef.style.left)
-			&& parseFloat(this._domRef.style.right) > object.getBoundingClientRect().left
-			&& object.getBoundingClientRect().bottom > parseFloat(this._domRef.style.top)
-			&& parseFloat(this._domRef.style.bottom) > object.getBoundingClientRect().top;
+		return object.getBoundingClientRect().right + window.scrollX > parseFloat(this._domRef.style.left)
+			&& parseFloat(this._domRef.style.right) > object.getBoundingClientRect().left + window.scrollX
+			&& object.getBoundingClientRect().bottom + window.scrollY > parseFloat(this._domRef.style.top)
+			&& parseFloat(this._domRef.style.bottom) > object.getBoundingClientRect().top + window.scrollY;
 	}
 
 	/*
