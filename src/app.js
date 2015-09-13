@@ -29,9 +29,9 @@ global.app = function () {
 	let marvel_selectionGroup = document.querySelector('.selection_groups .marvel');
 	let dc_selectionGroup = document.querySelector('.selection_groups .dc');
 	let idw_selectionGroup = document.querySelector('.selection_groups .idw');
-	let marvel_list = document.querySelector('.selection_list .marvel');
-	let dc_list= document.querySelector('.selection_list .dc');
-	let idw_list = document.querySelector('.selection_list .idw');
+	let marvel_list = document.querySelector('.selection_list .marvelList');
+	let dc_list= document.querySelector('.selection_list .dcList');
+	let idw_list = document.querySelector('.selection_list .idwList');
 
 
 	// create selections
