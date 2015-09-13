@@ -3,7 +3,7 @@ This is going to be a small javascript library for **mulit selection** and **dra
 
 
 ### Version
- 0.0.4
+ 0.0.5
 
 ### License
 MIT
