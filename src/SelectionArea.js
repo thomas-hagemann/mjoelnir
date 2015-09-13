@@ -14,10 +14,11 @@ class SelectionArea {
 	 * @constructs SelectionArea
 	 * @param {String} [parent = "selectionGroup"] - class name of the parent element contaning all selectable elements
 	 * @param {String} [id = parent+"Overlay"] - id of the overlay. The visual feedback of the area where elements will be marked. 
+	 * @param {String} [classString = "notSelectable"] - string of classes the overlay will be getting 
 	 * @param {String} [css = "background:rgba(51,153,255,0.4); border:1px solid rgb(51,153,255);"] - css for the overlay 
 	 * @returns {SelectionArea} instance of SelectionArea
 	 */
-	constructor(parent = "selectionGroup", id = parent+"Overlay", css = "background:rgba(51,153,255,0.4); border:1px solid rgb(51,153,255);") {
+	constructor(parent = "selectionGroup", id = parent+"Overlay", classString = "notSelectable", css = "background:rgba(51,153,255,0.4); border:1px solid rgb(51,153,255);") {
 		this.id = id;
 		this.parent = parent;
 
@@ -35,7 +36,7 @@ class SelectionArea {
 
 		// add a div representing the overlay to the parent element
 		document.querySelector("."+this.parent).innerHTML
-			+= `<div id="${this.id}" style="display: none; position: absolute;"></div>`;
+			+= `<div id="${this.id}" class="${classString}" style="display: none; position: absolute;"></div>`;
 		this._domRef = document.getElementById(this.id);
 
 		return this;
