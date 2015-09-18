@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+		<style>
+			
+			@import url(https://fonts.googleapis.com/css?family=Orbitron:900);
+
+			*{
+				margin: 0;
+				padding: 0;
+				font-family: Tahoma;
+				-moz-user-select: none;
+				user-select: none;
+			}
+
+			html, body, main{
+				width: 100%;
+				height: 100%;
+				background: #F0F1F2;
+			}
+
+			.selection_areas{
+				width: 900px;
+				display: flex;
+				flex-flow: row wrap;
+			}
+
+			.selection_areas > div{
+				flex: 2 0 0;
+				min-width: 50%;
+				padding: 20px;
+				box-sizing:border-box;
+			}
+
+			.marvel{
+				background: #ED1C24;
+				color: #FFFFFF;
+			}
+			.marvel .overlay{
+				background: #12E3DB;
+				color: #000000;
+			}
+			.dc{
+				background: #0770B2;
+				color: #131313;
+			}
+			.dc .overlay{
+				background: #F88F4D;
+				color: #000000;
+			}
+			.watchmen{
+				background: #000000;
+				color: #FFE713;
+			}
+			.watchmen .overlay{
+				background: #FFFFFF;
+				color: #0018EC;
+			}
+			.idw{
+				background: #FFFFFF;
+				color: #003966;
+			}
+			.idw .overlay{
+				background: #000000;
+				color: #FFC699;
+			}
+
+			.selectable{
+				display: inline-block;
+				padding: 20px;
+			}
+			
+			section div > *{
+				font-family: 'Orbitron', sans-serif;
+				font-size: 1.2em;
+				display: inline-block;
+				margin: 10px;
+				border: 2px solid;
+				padding: 5px 15px;
+				border-radius: 9px;
+			}
+
+			.selected, .inSelection{
+				background: limegreen;
+			}
+			
+			#mouseOverlay{
+				background:rgba(51,153,255,0.4); 
+				border:1px solid rgb(51,153,255); 
+				position: absolute;
+			}
+			
+			.isDraged{
+				opacity: 0.3;
+			}
+			
+			.dropzone, #details {
+				width: 300px;
+				height: 100px;
+				border: 1px solid black;
+			}
+			
+			.dropzone.valid {
+				border: 1px solid greenyellow;
+			}
+			
+			[draggable=true].selected{
+				cursor: move;
+			}
+
+		</style>
+	</head>
+	<body>
+		<main>
+			<section class="selection_areas">
+				<div class="selectable marvel selectable">
+					<div draggable="true">Princess Powerful</div>
+					<div draggable="true">Spider-Man</div>
+					<div draggable="true">Wolverine</div>
+					<div draggable="true">Thor</div>
+					<div draggable="true">Nightcrawler</div>
+					<div draggable="true">Captain America</div>
+					<div draggable="true">Iron Man</div>
+					<div draggable="true">Daredevil</div>
+					<div draggable="true">Hulk</div>
+				</div>
+				<div class="dc watchmen">
+					<div>Rorschach</div>
+					<div>Dr. Manhattan</div>
+					<div>Nite Owl</div>
+				</div>
+				<div class="dc">
+					<div>Oracle</div>
+					<div>Nightwing</div>
+					<div>Flash</div>
+					<div>Green Lantern</div>
+					<div>Wonder Woman</div>
+					<div>Batman</div>
+					<div>Superman</div>
+					<div>Aquaman</div>
+					<div>Martian Manhunter</div>
+				</div>
+				<div class="idw">
+					<div>Raphael</div>
+					<div>Donatello</div>
+					<div>Michelangelo</div>
+					<div>Leonardo</div>
+				</div>
+			</section>
+		</main>
+
+		 <script type="text/javascript">
+			var mousePosition = { 'start':{ 'x': null, 'y': null }, 'current':{ 'x': 0, 'y': 0 } };
+			
+			document.addEventListener('DOMContentLoaded', function() {
+			
+				var forEach = Array.prototype.forEach;
+
+				function intersectWithSelection(object){
+					var element = {
+						'top': object.getBoundingClientRect().top,
+						'left': object.getBoundingClientRect().left,
+						'width': object.getBoundingClientRect().width,  
+						'height': object.getBoundingClientRect().height,
+						'bottom': object.getBoundingClientRect().bottom,  
+						'right': object.getBoundingClientRect().right
+					};	
+					var selection = getMouseOverlay();		
+					return element.right > selection.left && selection.right > element.left &&
+							element.bottom > selection.top && selection.bottom > element.top;
+				}
+
+				function getMouseOverlay(){
+					return {
+						'top': Math.min(mousePosition.start.y, mousePosition.current.y), 
+						'left': Math.min(mousePosition.start.x, mousePosition.current.x), 
+						'width': Math.abs(mousePosition.start.x - mousePosition.current.x),  
+						'height': Math.abs(mousePosition.start.y - mousePosition.current.y),
+						'bottom': Math.min(mousePosition.start.y, mousePosition.current.y)+Math.abs(mousePosition.start.y - mousePosition.current.y),  
+						'right': Math.min(mousePosition.start.x, mousePosition.current.x)+Math.abs(mousePosition.start.x - mousePosition.current.x)
+					};
+				}		
+
+				function isOverlayBiggerThanMinSize(){
+					var minSize = 10;
+					return Math.abs(mousePosition.current.x - mousePosition.start.x) > minSize ||
+							  Math.abs(mousePosition.current.y - mousePosition.start.y) > minSize;
+				}
+
+				document.addEventListener('mousedown', function(event){
+					if(event.target.matches('.selectable')){
+						event.preventDefault();		
+						
+						mousePosition.start.x = event.pageX;
+						mousePosition.start.y = event.pageY;	
+
+						// marked selected and clear old selection
+						forEach.call(document.querySelectorAll(".selected"), function( element ){
+							if(event.ctrlKey){
+								element.classList.add('marked');
+							}
+							element.classList.remove('selected');
+						});
+						
+						// add marked to current selection
+						forEach.call(document.querySelectorAll(".marked"), function( element ){
+							element.classList.add('inSelection');
+						});	
+					}
+				});
+				
+				document.addEventListener('mousedown', function(event){
+					if(event.target.matches('.selectable > *')){
+						event.stopPropagation();
+			
+						if(event.ctrlKey){	
+							if(event.target.className.indexOf("selected") > -1){//includes
+								event.target.classList.remove('selected');
+							}else{
+								event.target.classList.add("inSelection");
+								event.target.classList.add("marked");
+							}
+						} else {
+							if(event.target.className.indexOf("selected") == -1){//includes
+								forEach.call(document.querySelectorAll(".selected"), function(element){
+									element.classList.remove('selected');
+								});	
+							}
+							event.target.classList.add("selected");
+						}
+						
+					}
+				});
+
+				document.addEventListener('mouseup', function(event){
+					if(event.target.matches('.selectable, #mouseOverlay')){
+						event.preventDefault();
+
+						if(!event.ctrlKey){	
+							forEach.call(document.querySelectorAll(".selected"), function(element){
+								element.classList.remove('selected');
+							});	
+						}
+
+						// set current selection as selected
+						forEach.call(document.querySelectorAll(".inSelection"), function( element ){
+							element.classList.add('selected');
+							element.classList.remove('inSelection');
+						});
+						
+						forEach.call(document.querySelectorAll(".marked"), function( element ){
+							element.classList.remove('marked');
+						});
+
+						mousePosition.start.x = null;
+						mousePosition.start.y = null;
+
+						var overlay = document.getElementById("mouseOverlay");
+						if(overlay) overlay.parentNode.removeChild(overlay);
+					}
+				});
+
+				document.addEventListener('mouseup', function(event){
+					if(event.target.matches('.selectable > *')){
+						event.preventDefault();
+						if(event.ctrlKey){
+							forEach.call(document.querySelectorAll(".inSelection"), function( element ){
+								element.classList.add('selected');
+								element.classList.remove('inSelection');
+							});
+						}
+						
+						forEach.call(document.querySelectorAll(".marked"), function( element ){
+							element.classList.remove('marked');
+						});
+					}
+				});
+
+				document.addEventListener('mousemove', function(event){
+					if(event.target.matches('.selectable, .selectable *, #mouseOverlay, #mouseOverlay *')){
+						mousePosition.current.x = event.pageX;
+						mousePosition.current.y = event.pageY;
+						// if mouseOverlay exists
+						
+						if(document.getElementById("mouseOverlay")){
+							// update overlay size				
+							var newMouseOverlayStyle = getMouseOverlay();
+							var mouseOverlay = document.querySelector('#mouseOverlay');
+							mouseOverlay.style.top = newMouseOverlayStyle.top+"px";
+							mouseOverlay.style.left = newMouseOverlayStyle.left+"px";
+							mouseOverlay.style.width = newMouseOverlayStyle.width+"px";
+							mouseOverlay.style.height = newMouseOverlayStyle.height+"px";
+							mouseOverlay.style.bottom = newMouseOverlayStyle.bottom+"px";
+							mouseOverlay.style.right = newMouseOverlayStyle.right+"px";
+							
+							// if overlay is bigger than min size
+							if(isOverlayBiggerThanMinSize()){
+								// clear marked 
+								forEach.call(document.querySelectorAll(".inSelection:not(.marked)"), function(element){
+									element.classList.remove('inSelection');
+								});
+								forEach.call(document.querySelectorAll(".marked"), function(element){
+									element.classList.add('inSelection');
+								});	
+								
+								forEach.call(document.querySelectorAll(".selectable > *"), function(element){
+									if(intersectWithSelection(element)){
+										if(element.className.indexOf("marked")>-1){
+											element.classList.remove('inSelection');
+										} else{											
+											element.classList.add('inSelection');
+										}
+									}
+								});
+							}
+						} else if(mousePosition.start.x != null || mousePosition.start.y != null){
+							var overlay = document.createElement("div");
+							overlay.id = 'mouseOverlay';
+							overlay.style.left = mousePosition.start.x+'px'; 
+							overlay.style.top = mousePosition.start.y+'px';
+							document.body.appendChild(overlay);
+						}
+					}
+				});
+
+				document.addEventListener('dragstart', function(event){
+					if(event.target.matches('.selectable > *')){
+						var dataDragIds = [];
+						var dataDragTypes = [];
+						var parentId =  Math.trunc(Math.random()*100000);
+						event.target.parentElement.setAttribute("parent-drag-id", parentId);
+						forEach.call(document.querySelectorAll(".selected"), function( element ){
+							var dataDragId = Math.trunc(Math.random()*100000);
+							element.classList.add('isDraged');
+							element.setAttribute("data-drag-id", dataDragId);
+							dataDragIds.push(dataDragId);
+							dataDragTypes.push(element.getAttribute("data-drag-id"));
+						});	
+						event.dataTransfer.setData("data-drag-ids", dataDragIds);
+						event.dataTransfer.setData("parent-drag-id", parentId);
+						event.dataTransfer.effectAllowed = 'move';
+					}
+				});
+
+				var xbefore = 0;
+				function isAddToLeftSide(hoverdElement, event){
+					var isAddToLeftSide = false;
+					if(event.pageX-xbefore<=0){
+						isAddToLeftSide  = true;
+					}
+					xbefore=event.pageX; 
+					return isAddToLeftSide;
+				}
+				
+				document.addEventListener('dragover', function(event){
+					if(event.target.matches('.selectable > *:not(.isDraged)')){	
+						event.preventDefault();
+						var currentParrentID = event.target.parentElement.getAttribute("parent-drag-id");
+						var expectedParrentID = event.dataTransfer.getData("parent-drag-id");
+						if(currentParrentID == expectedParrentID){
+							var dragIDs = event.dataTransfer.getData("data-drag-ids");
+							if(dragIDs.length > 0){
+								dragIDs = dragIDs.split(",");
+								dragIDs.forEach((element, index, array) => { array[index] = "[data-drag-id='"+element+"']"; });
+								var dragedElements = document.querySelectorAll(dragIDs.join());	
+
+								if(isAddToLeftSide(event.target, event)){
+									forEach.call(dragedElements, function( element ){
+										event.target.parentNode.insertBefore(element, event.target);
+									});	
+								} else {
+									var refNode = event.target;
+									forEach.call(dragedElements, function( element ){
+										refNode.parentNode.insertBefore(element, refNode.nextSibling);
+										refNode = element;
+									});	
+								}
+							}
+						}
+					}
+				});	
+
+				document.addEventListener('dragend', function(event){
+					if(event.target.matches('.selectable > *')){	
+					console.log("dragend");
+						event.preventDefault();
+						forEach.call(document.querySelectorAll("[parent-drag-id]"), function( element ){
+							element.removeAttribute("parent-drag-id");
+						});	
+						forEach.call(document.querySelectorAll("[data-drag-id]"), function( element ){
+							element.removeAttribute("data-drag-id");
+						});	
+						forEach.call(document.querySelectorAll(".isDraged"), function( element ){
+							element.classList.remove("isDraged");
+						});	
+						forEach.call(document.querySelectorAll(".selected"), function( element ){
+							element.classList.remove("selected");
+						});	
+					}
+				});
+
+			});
+		 </script>
+	</body>
+</html>
+
