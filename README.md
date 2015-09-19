@@ -9,6 +9,9 @@ $ cd mjoelnir
 
 # Install all dependencies
 $ npm install
+
+# run
+$ gulp watch
 ```
 
 ### Demo 
