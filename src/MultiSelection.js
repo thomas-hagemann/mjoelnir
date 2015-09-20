@@ -12,7 +12,7 @@ const forEach = Array.prototype.forEach;
 class MultiSelection {
 
 	/**
-	 * Constructs an instance of Vector
+	 * Constructs an instance of MultiSelection
 	 * Default settings are :
 	 *  notSelectableClass: "notSelectable"
 	 *	wasSelectedClass: "wasSelected"
@@ -67,9 +67,12 @@ class MultiSelection {
 
 		// create selection area
 		this._overlay = new SelectionArea(this._config.selectionGroup, this._config.overlayID, this._config.notSelectableClass, this._config.overlayCss);
+		this._config.overlayID = this._overlay.id;
 
+		// create last selection memory
+		this._lastSelection = [];
 		// create selectionChanged event
-		this.selectionChangedEvent = new Event('selectionChanged');
+		this._selectionChangedEvent = new Event('selectionChanged');
 
 		// add mouse events
 		this._addMouseDownEventListener();
@@ -92,7 +95,7 @@ class MultiSelection {
 
 		return config;
 	}
-
+	
 	/*
 	 * Adds mouse down event listener to the document.
 	 *
@@ -100,12 +103,13 @@ class MultiSelection {
 	 * @returns {MultiSelection} instance of MultiSelection 
 	 */
 	_addMouseDownEventListener(){
-		document.addEventListener('mousedown', event => {
-			// define short names
-			const targetClass = this._config.selectionGroup;
+		// define short names
+		const targetClass = this._config.selectionGroup;
 
-			// check if mouse down is on defined element or its children
-			if(event.target.matches(`.${targetClass}, .${targetClass} *`)){
+		document.addEventListener('mousedown', event => {
+			// check if mouse down is on defined element
+			if(event.target.matches(`.${targetClass}`)){
+			
 				this._overlay.setPivot(event.pageX, event.pageY);
 
 				// run through all selected elements
@@ -122,20 +126,49 @@ class MultiSelection {
 				forEach.call(document.querySelectorAll(`.${targetClass} .${this._config.wasSelectedClass}`), element => {
 					this._addToWillBeSelected(element);
 				});
+			}
+		});
 
-				// check if mouse down is on a selectable element
-				// and toggle its current selection marker
-				if(event.target.matches(`.${targetClass} *`)){
-					if(event.target.className.includes(this._config.willBeSelectedClass)){
-						this._removeFromWillBeSelected(event.target);
-					} else{
+		document.addEventListener('mousedown', event => {
+			// check if mouse down is on the children of the defined element
+			if(event.target.matches(`.${targetClass} > *`)){
+				event.stopPropagation();
+				
+				if(event.ctrlKey){	
+					if(event.target.className.includes(this._config.selectedClass)){
+						this._removeFromSelection(event.target);
+					}else{
 						this._addToWillBeSelected(event.target);
+						this._addToWasSelected(event.target);
 					}
+				} else {
+					if(!event.target.className.includes(this._config.selectedClass)){
+						forEach.call(document.querySelectorAll(`.${targetClass} .${this._config.selectedClass}`), element => {
+							this._removeFromSelection(element);
+						});	
+					}
+					this._addToSelection(event.target);
 				}
 			}
 		});
 
 		return this;
+	}
+	
+	_checkAndThrowSelectionChangeEvent(){
+		const lastSelection = this._lastSelection;
+		const currentSelection = [...document.querySelectorAll(`.${this._config.selectionGroup} .${this._config.selectedClass}`)];
+
+		// if elements that are selected and were selected before are diffrent 
+		// a selection change event is triggert
+		if(!(currentSelection.length == lastSelection.length 
+			&& currentSelection.every((element, index) => element === lastSelection[index]))){
+			forEach.call(document.querySelectorAll(`.${this._config.selectionGroup}`), element => {
+				this._selectionChangedEvent.selection = currentSelection;
+				element.dispatchEvent(this._selectionChangedEvent);
+			});			
+		}
+		this._lastSelection = currentSelection;
 	}
 
 	/*
@@ -145,41 +178,38 @@ class MultiSelection {
 	 * @returns {MultiSelection} instance of MultiSelection 
 	 */
 	_addMouseUpEventListener(){
-		document.addEventListener('mouseup', event => {
-			// define short names
-			const targetClass = this._config.selectionGroup;
+		// define short names
+		const targetClass = this._config.selectionGroup;
 
-			// hide the overlay
-			this._overlay.hide();
+		document.addEventListener(`mouseup`, event => {
+			if(event.target.matches(`.${targetClass}, .${targetClass} > *, #${this._config.overlayID}`)){
+			
+				if(!event.ctrlKey){	
+					forEach.call(document.querySelectorAll(`.${targetClass} .${this._config.selectedClass}`), element => {
+						this._removeFromSelection(element);
+					});	
+				}
 
-			const elementsThatWillBeSelected = document.querySelectorAll(`.${targetClass} .${this._config.willBeSelectedClass}`);
-			const elementsThatWereSelected = document.querySelectorAll(`.${targetClass} .${this._config.wasSelectedClass}`);
+				// run through all currently selected elements and switch the currently selected marker for the selected one
+				forEach.call(document.querySelectorAll(`.${targetClass} .${this._config.willBeSelectedClass}`), element => {
+					this._addToSelection(element)._removeFromWillBeSelected(element);
+				});
+				
+				// run through all "marked" elements and remove the flag
+				forEach.call(document.querySelectorAll(`.${targetClass} .${this._config.wasSelectedClass}`), element => {
+					this._removeFromWasSelected(element);
+				});
 
-			// run through all currently selected elements and switch the currently selected marker for the selected one
-			forEach.call(elementsThatWillBeSelected, element => {
-				this._addToSelection(element)._removeFromWillBeSelected(element);
-			});
+				// hide the overlay
+				this._overlay.hide();
 
-			// run through all "marked" elements and remove the flag
-			forEach.call(elementsThatWereSelected, element => {
-				this._removeFromWasSelected(element);
-			});
-
-			const willBeArray = [...elementsThatWillBeSelected];
-			const wereArray = [...elementsThatWereSelected];
-			// if elements that will be selected and were selected are diffrent 
-			// a selection change event is triggert
-			if(!(willBeArray.length == wereArray.length 
-				&& willBeArray.every((element, index) => element === wereArray[index]))){
-				forEach.call(document.querySelectorAll(`.${targetClass}`), element => {
-					this.selectionChangedEvent.selection = willBeArray;
-					element.dispatchEvent(this.selectionChangedEvent);
-				});			
+				this._checkAndThrowSelectionChangeEvent();
 			}
 		});
 
 		return this;
 	}
+
 
 	/*
 	 * Adds mouse move event listener to the document.
@@ -188,44 +218,46 @@ class MultiSelection {
 	 * @returns {MultiSelection} instance of MultiSelection 
 	 */
 	_addMouseMoveEventListener(){
-		document.addEventListener('mousemove', event => {
-			// define short names
-			const targetClass = this._config.selectionGroup;
-			const wasSelectedClass = this._config.wasSelectedClass;
+		// define short names
+		const targetClass = this._config.selectionGroup;
+		const wasSelectedClass = this._config.wasSelectedClass;
 
+		document.addEventListener('mousemove', event => {
 			// check if mouse over is on defined element or its children 
 			// and if the overlay is visible
-			if(event.target.matches(`.${targetClass}, .${targetClass} *`) && this._overlay.isVisible()){
+			if(event.target.matches(`.${targetClass}, .${targetClass} *`)){
+				
+				if(this._overlay.isVisible()){
+					// update the overlays demensions
+					this._overlay.updateDimensions(event.pageX, event.pageY);
 
-				// update the overlays demensions
-				this._overlay.updateDimensions(event.pageX, event.pageY);
+					// only if overlay is bigger than min size it is used for selection, so not to influence the click event
+					if(this._overlay.isBigerThan(event.pageX, event.pageY)){
 
-				// only if overlay is bigger than min size it is used for selection, so not to influence the click event
-				if(this._overlay.isBigerThan()){
+						// reset everything that will be selected by the overlay, except elements that were already selected
+						// this makes sure once hoverd elements are not selected when the overlay does not intersect with them anymore
+						forEach.call(document.querySelectorAll(`.${targetClass} .${this._config.willBeSelectedClass}:not(.${wasSelectedClass})`), element => {
+							this._removeFromWillBeSelected(element);
+						});
 
-					// reset everything that will be selected by the overlay, except elements that were already selected
-					// this makes sure once hoverd elements are not selected when the overlay does not intersect with them anymore
-					forEach.call(document.querySelectorAll(`.${targetClass} .${this._config.willBeSelectedClass}:not(.${wasSelectedClass})`), element => {
-						this._removeFromWillBeSelected(element);
-					});
+	                    // run through all marked elements and add them to the current selection
+	                    forEach.call(document.querySelectorAll(`.${targetClass} .${wasSelectedClass}`), element => {
+	                        this._addToWillBeSelected(element);
+	                    });
 
-                    // run through all marked elements and add them to the current selection
-                    forEach.call(document.querySelectorAll(`.${targetClass} .${wasSelectedClass}`), element => {
-                        this._addToWillBeSelected(element);
-                    });
-
-					// run through all direct children of the selection content element
-					// and check if they intersect with the overlay
-					// and if so add or remove them to the current selection
-					forEach.call(document.querySelectorAll(`.${targetClass} > *`), element => {
-						if(this._overlay.intersectsWith(element)){
-							if(element.className.includes(wasSelectedClass)){
-								this._removeFromWillBeSelected(element);
-							} else{
-								this._addToWillBeSelected(element);
+						// run through all direct children of the selection content element
+						// and check if they intersect with the overlay
+						// and if so add or remove them to the current selection
+						forEach.call(document.querySelectorAll(`.${targetClass} > *`), element => {
+							if(this._overlay.intersectsWith(element)){
+								if(element.className.includes(wasSelectedClass)){
+									this._removeFromWillBeSelected(element);
+								} else{
+									this._addToWillBeSelected(element);
+								}
 							}
-						}
-					});
+						});
+					}
 				}
 			}
 		});
@@ -298,7 +330,9 @@ class MultiSelection {
 	 * @returns {MultiSelection} instance of MultiSelection 
 	 */
 	_addToSelection(element){
-		element.classList.add(this._config.selectedClass);
+		if(!element.className.includes(this._config.notSelectableClass)){
+			element.classList.add(this._config.selectedClass);
+		}
 		
 		return this;
 	}

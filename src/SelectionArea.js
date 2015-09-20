@@ -24,9 +24,7 @@ class SelectionArea {
 
 		// starting point for the selection area. On mouse movement the overlay will pivot around this point
 		this._pivotPoint = new Vector(0, 0);
-		// current mouse position and always the opposite coner to the pivot point
-		this._currentPosition = new Vector(0, 0);
-
+		
 		// add style to page head
 		const style = document.createElement("style");
 		style.innerHTML = 	`#${id} {
@@ -66,9 +64,9 @@ class SelectionArea {
 	 * @returns {SelectionArea} instance of SelectionArea
 	 */
 	updateDimensions(x = 0, y = 0){
-		this._currentPosition.setCoordinates(x, y);
-		const minValue = this._currentPosition.getMinValueVektor(this._pivotPoint);
-		const difference = this._currentPosition.getDistanceVector(this._pivotPoint);
+		const currentPosition = new Vector(x, y);
+		const minValue = currentPosition.getMinValueVektor(this._pivotPoint);
+		const difference = currentPosition.getDistanceVector(this._pivotPoint);
 		this._setStyleDimensions(difference.x, difference.y, minValue.y, minValue.x+difference.x, minValue.y+difference.y, minValue.x);
 
 		return this;
@@ -113,15 +111,18 @@ class SelectionArea {
 	}
 
 	/*
-	 * Analyses if the selection area is bigger than a given width and height.
+	 * Analyses if the selection area between the pivot point and a given point is bigger than a given width and height.
 	 *
 	 * @method isBigerThan
+	 * @param {Number} [x = 0] - x coordinate of the pivot point
+	 * @param {Number} [y = 0] - y coordinate of the pivot point
 	 * @param {Number} [width = 5] - width of the selection area
 	 * @param {Number} [heigh = 5] - heigh of the selection area
 	 * @returns {Boolean} true if the selection area is bigger than a given width and height
 	 */
-	isBigerThan(width = 5, height = 5){
-		const difference = this._currentPosition.getDistanceVector(this._pivotPoint);
+	isBigerThan(x = 0, y = 0, width = 5, height = 5){
+		let currentPosition = new Vector(x, y);
+		const difference = currentPosition.getDistanceVector(this._pivotPoint);
 		return difference.x > width || difference.y > height;
 	}
 
