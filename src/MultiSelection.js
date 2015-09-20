@@ -147,7 +147,7 @@ class MultiSelection {
 							this._removeFromSelection(element);
 						});	
 					}
-					this._addToSelection(event.target);
+					this._addToWillBeSelected(event.target);
 				}
 			}
 		});
