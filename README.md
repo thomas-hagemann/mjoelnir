@@ -1,5 +1,5 @@
 # Mjölnir
-This is going to be a small javascript library for **mulit selection** and **drag and drop**.
+This is going to be a small javascript library for **mulit selection**, **sorting** and **drag and drop**.
 
 ### Initial setup
 ```sh
@@ -19,12 +19,12 @@ Demo for [multi selection](http://thomashagemann.altervista.org/mjoelnir_example
 
 
 ### Version
- 0.0.5
+ 0.0.6
 
 ### License
 MIT
 
-### Tech
+### Technologies
 Currently used dependencies:
 * Font [Orbitron](https://fonts.googleapis.com/css?family=Orbitron:900)
 * ~~jQuery (only in prototypes)~~

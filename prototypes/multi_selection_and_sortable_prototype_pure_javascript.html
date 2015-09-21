@@ -114,7 +114,7 @@
 	<body>
 		<main>
 			<section class="selection_areas">
-				<div class="selectable marvel selectable">
+				<div class="selectable marvel">
 					<div draggable="true">Princess Powerful</div>
 					<div draggable="true">Spider-Man</div>
 					<div draggable="true">Wolverine</div>
@@ -325,7 +325,7 @@
 				});
 
 				document.addEventListener('dragstart', function(event){
-					if(event.target.matches('.selectable > *')){
+					if(event.target.matches('.marvel > *')){
 						var dataDragIds = [];
 						var dataDragTypes = [];
 						var parentId =  Math.trunc(Math.random()*100000);
@@ -354,7 +354,7 @@
 				}
 				
 				document.addEventListener('dragover', function(event){
-					if(event.target.matches('.selectable > *:not(.isDraged)')){	
+					if(event.target.matches('.marvel > *:not(.isDraged)')){	
 						event.preventDefault();
 						var currentParrentID = event.target.parentElement.getAttribute("parent-drag-id");
 						var expectedParrentID = event.dataTransfer.getData("parent-drag-id");
@@ -382,7 +382,7 @@
 				});	
 
 				document.addEventListener('dragend', function(event){
-					if(event.target.matches('.selectable > *')){	
+					if(event.target.matches('.marvel > *')){	
 					console.log("dragend");
 						event.preventDefault();
 						forEach.call(document.querySelectorAll("[parent-drag-id]"), function( element ){
