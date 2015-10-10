@@ -4,6 +4,7 @@
  * @author Thomas Hagemann
  */
  import {MultiSelection} from "./MultiSelection";
+ import {Sort} from "./Sort";
 
 
 function getInversedColor(color){
@@ -70,5 +71,11 @@ global.app = function () {
 	idw_selectionGroup.addEventListener('selectionChanged', event => {
 		idw_list.innerHTML = "";
 		event.selection.forEach(element => { idw_list.innerHTML += `<li>${element.textContent}</li>` });
+	});
+
+	new Sort({
+		sortableGroup: "marvel", 
+		notSortableClass: "cant_touch_this",
+		selectedClassesQuerySelector: ".willBeSelected, .selected"
 	});
 };

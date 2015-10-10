@@ -181,30 +181,33 @@ class MultiSelection {
 		// define short names
 		const targetClass = this._config.selectionGroup;
 
-		document.addEventListener(`mouseup`, event => {
-			if(event.target.matches(`.${targetClass}, .${targetClass} > *, #${this._config.overlayID}`)){
-			
-				if(!event.ctrlKey){	
-					forEach.call(document.querySelectorAll(`.${targetClass} .${this._config.selectedClass}`), element => {
-						this._removeFromSelection(element);
-					});	
+		// not only mouse up but also dragend finishes the selecting process
+		["mouseup","dragend"].forEach(eventType => {
+			document.addEventListener(eventType, event => {
+				if(event.target.matches(`.${targetClass}, .${targetClass} > *, #${this._config.overlayID}`)){
+
+					if(!event.ctrlKey){	
+						forEach.call(document.querySelectorAll(`.${targetClass} .${this._config.selectedClass}`), element => {
+							this._removeFromSelection(element);
+						});	
+					}
+
+					// run through all currently selected elements and switch the currently selected marker for the selected one
+					forEach.call(document.querySelectorAll(`.${targetClass} .${this._config.willBeSelectedClass}`), element => {
+						this._addToSelection(element)._removeFromWillBeSelected(element);
+					});
+					
+					// run through all "marked" elements and remove the flag
+					forEach.call(document.querySelectorAll(`.${targetClass} .${this._config.wasSelectedClass}`), element => {
+						this._removeFromWasSelected(element);
+					});
+
+					// hide the overlay
+					this._overlay.hide();
+
+					this._checkAndThrowSelectionChangeEvent();
 				}
-
-				// run through all currently selected elements and switch the currently selected marker for the selected one
-				forEach.call(document.querySelectorAll(`.${targetClass} .${this._config.willBeSelectedClass}`), element => {
-					this._addToSelection(element)._removeFromWillBeSelected(element);
-				});
-				
-				// run through all "marked" elements and remove the flag
-				forEach.call(document.querySelectorAll(`.${targetClass} .${this._config.wasSelectedClass}`), element => {
-					this._removeFromWasSelected(element);
-				});
-
-				// hide the overlay
-				this._overlay.hide();
-
-				this._checkAndThrowSelectionChangeEvent();
-			}
+			});
 		});
 
 		return this;
